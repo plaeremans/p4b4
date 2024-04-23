@@ -9,7 +9,7 @@ def create_db_connection():
         database="main",
         user="main",
         password=os.getenv("PGPASSWORD"),
-        host="/Users/pieter/cloudsql2/diagnostics-uz:europe-west1:genomicscore-main",
+        host=f"{os.getenv('CLOUD_SQL_SOCKET_DIR')}/{os.getenv('CLOUD_SQL_CONNECTION_NAME')}",
         port="",
     )
     return connection
@@ -25,7 +25,7 @@ def main() -> int:
 
     cursor = conn.cursor()
     cursor.execute(
-        "select  nspname, proname, pg_get_functiondef(p.oid)   from  pg_proc p, pg_namespace np  where pronamespace=16564 and np.oid = pronamespace;"
+        "select  nspname, proname, pg_get_functiondef(p.oid)   from  pg_proc p, pg_namespace np  where  nspname not like 'pg_%' and np.oid = pronamespace;"
     )
     dump_dir = pathlib.Path(os.getcwd())
     for row in cursor:
